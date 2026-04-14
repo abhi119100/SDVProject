@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Player Value — Performance Metrics &amp; Salary Efficiency</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: #111827;
+            --bg-card-alt: #1a2332;
+            --accent: #f97316;
+            --accent-glow: rgba(249, 115, 22, 0.25);
+            --blue: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --teal: #14b8a6;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --border: #1e293b;
+            --code-bg: #0d1117;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            transition: box-shadow .3s;
+        }
+        nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,.4); }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            font-weight: 800; font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent), #fb923c);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none; font-size: .85rem;
+            font-weight: 500; transition: color .2s; position: relative;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: var(--accent); transition: width .3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; padding: 6rem 2rem 4rem;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249,115,22,.12), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,130,246,.08), transparent);
+        }
+        .hero-content { position: relative; max-width: 860px; }
+        .hero-badge {
+            display: inline-block; padding: .4rem 1.2rem; border-radius: 50px;
+            background: rgba(249,115,22,.1); border: 1px solid rgba(249,115,22,.3);
+            color: var(--accent); font-size: .8rem; font-weight: 600;
+            letter-spacing: .05em; text-transform: uppercase; margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 900;
+            line-height: 1.1; margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent), #fb923c);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.15rem; color: var(--text-muted); max-width: 640px;
+            margin: 0 auto 2.5rem; line-height: 1.8;
+        }
+        .hero-meta {
+            display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;
+            color: var(--text-dim); font-size: .85rem;
+        }
+        .hero-meta span { display: flex; align-items: center; gap: .4rem; }
+
+        /* ── SECTIONS ── */
+        section { padding: 5rem 2rem; }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .section-label {
+            display: inline-block; font-size: .75rem; font-weight: 700;
+            letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+            margin-bottom: .75rem;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800;
+            line-height: 1.2; margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.05rem; color: var(--text-muted);
+            max-width: 680px; margin-bottom: 3rem;
+        }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem; margin: 3rem 0;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem; text-align: center;
+            transition: transform .2s, border-color .2s;
+        }
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+        .stat-number {
+            font-size: 2.2rem; font-weight: 800; margin-bottom: .25rem;
+        }
+        .stat-number.orange { color: var(--accent); }
+        .stat-number.blue { color: var(--blue); }
+        .stat-number.green { color: var(--green); }
+        .stat-number.teal { color: var(--teal); }
+        .stat-label { font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+
+        /* ── STORY CARDS ── */
+        .story-block {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 2.5rem; margin-bottom: 2rem;
+            position: relative; overflow: hidden;
+        }
+        .story-block::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 4px; height: 100%; background: linear-gradient(to bottom, var(--accent), var(--blue));
+        }
+        .story-block h3 {
+            font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;
+        }
+        .story-block p { color: var(--text-muted); margin-bottom: .75rem; }
+
+        /* ── CODE BLOCKS ── */
+        .code-section {
+            background: var(--code-bg); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; margin: 2rem 0;
+        }
+        .code-header {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .75rem 1.25rem; background: #161b22; border-bottom: 1px solid var(--border);
+        }
+        .code-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .code-dot.red { background: #ff5f57; }
+        .code-dot.yellow { background: #febc2e; }
+        .code-dot.green { background: #28c840; }
+        .code-filename {
+            margin-left: .5rem; font-size: .8rem; color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .code-body {
+            padding: 1.25rem 1.5rem; overflow-x: auto; font-size: .82rem;
+            line-height: 1.8; font-family: 'JetBrains Mono', monospace;
+            color: #c9d1d9;
+        }
+        .code-body .kw { color: #ff7b72; }
+        .code-body .fn { color: #d2a8ff; }
+        .code-body .str { color: #a5d6ff; }
+        .code-body .cm { color: #8b949e; font-style: italic; }
+        .code-body .num { color: #79c0ff; }
+        .code-body .op { color: #ff7b72; }
+
+        /* ── TABLEAU EMBED ── */
+        .dashboard-frame {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; overflow: hidden; margin: 2rem 0;
+        }
+        .dashboard-label {
+            padding: 1rem 1.5rem; display: flex; align-items: center; gap: .75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .dashboard-label .dot {
+            width: 10px; height: 10px; border-radius: 50%; background: var(--green);
+            box-shadow: 0 0 8px rgba(34,197,94,.4);
+        }
+        .dashboard-label span {
+            font-size: .85rem; font-weight: 600; color: var(--text-muted);
+        }
+        .dashboard-frame iframe {
+            width: 100%; height: 750px; border: none; display: block;
+        }
+
+        /* ── INSIGHT CARDS ── */
+        .insights-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem; margin: 2rem 0;
+        }
+        .insight-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.75rem;
+            transition: transform .2s, border-color .2s;
+        }
+        .insight-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .insight-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 1rem;
+        }
+        .insight-icon.steal { background: rgba(34,197,94,.12); }
+        .insight-icon.overpaid { background: rgba(239,68,68,.12); }
+        .insight-icon.team { background: rgba(59,130,246,.12); }
+        .insight-icon.metric { background: rgba(249,115,22,.12); }
+        .insight-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+        .insight-card p { font-size: .88rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ── TIMELINE ── */
+        .pipeline {
+            display: flex; flex-wrap: wrap; gap: 0; justify-content: center;
+            margin: 3rem 0;
+        }
+        .pipeline-step {
+            display: flex; align-items: center;
+        }
+        .pipeline-node {
+            padding: .6rem 1.2rem; border-radius: 10px; font-size: .82rem;
+            font-weight: 600; white-space: nowrap;
+            border: 1px solid var(--border); background: var(--bg-card);
+        }
+        .pipeline-node.active {
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            border-color: var(--accent); color: #fff;
+        }
+        .pipeline-arrow {
+            color: var(--text-dim); margin: 0 .4rem; font-size: 1.1rem;
+        }
+
+        /* ── PLAYER TABLE ── */
+        .table-wrap {
+            overflow-x: auto; margin: 2rem 0;
+            border-radius: 16px; border: 1px solid var(--border);
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: .82rem;
+        }
+        thead { background: var(--bg-card-alt); }
+        th {
+            padding: .85rem 1rem; text-align: left; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase; font-size: .72rem;
+            letter-spacing: .06em; border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: .75rem 1rem; border-bottom: 1px solid var(--border);
+        }
+        tbody tr { background: var(--bg-card); transition: background .15s; }
+        tbody tr:hover { background: var(--bg-card-alt); }
+        .label-steal {
+            background: rgba(34,197,94,.15); color: #4ade80;
+            padding: .2rem .6rem; border-radius: 6px; font-weight: 600; font-size: .75rem;
+        }
+        .label-overpaid {
+            background: rgba(239,68,68,.15); color: #f87171;
+            padding: .2rem .6rem; border-radius: 6px; font-weight: 600; font-size: .75rem;
+        }
+        .label-fair {
+            background: rgba(148,163,184,.12); color: #94a3b8;
+            padding: .2rem .6rem; border-radius: 6px; font-weight: 600; font-size: .75rem;
+        }
+
+        /* ── TOOLS GRID ── */
+        .tools-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem; margin: 2rem 0;
+        }
+        .tool-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem;
+        }
+        .tool-card h4 {
+            font-size: .95rem; font-weight: 700; margin-bottom: .5rem;
+            color: var(--accent);
+        }
+        .tool-card p { font-size: .85rem; color: var(--text-muted); }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 0;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center; padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim); font-size: .85rem;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* ── SCROLL ANIMATION ── */
+        .fade-in {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            section { padding: 3rem 1.25rem; }
+            .story-block { padding: 1.5rem; }
+            .dashboard-frame iframe { height: 500px; }
+            .pipeline { flex-direction: column; align-items: center; }
+            .pipeline-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav id="navbar">
+    <div class="nav-inner">
+        <div class="nav-logo">NBA Analytics</div>
+        <ul class="nav-links">
+            <li><a href="#problem">Problem</a></li>
+            <li><a href="#data">Data</a></li>
+            <li><a href="#project1">Project 1</a></li>
+            <li><a href="#project2">Project 2</a></li>
+            <li><a href="#findings">Findings</a></li>
+            <li><a href="#tools">Tools</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero" id="top">
+    <div class="hero-content fade-in">
+        <div class="hero-badge">CSCE 5320 &middot; Scientific Data Visualization</div>
+        <h1>NBA Player <span>Value</span>:<br>Performance Metrics &amp; Salary Efficiency</h1>
+        <p>Do NBA teams get what they pay for? This project explores the 2024-25 season to uncover who the top performers are, how stats vary by position, and which players deliver the most — or least — value per dollar.</p>
+        <div class="hero-meta">
+            <span>Abhijit Sappidi</span>
+            <span>&middot;</span>
+            <span>2024-25 NBA Season</span>
+            <span>&middot;</span>
+            <span>590 Players Analyzed</span>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ THE PROBLEM ═══════════════ -->
+<div class="divider"></div>
+<section id="problem">
+    <div class="container fade-in">
+        <div class="section-label">Chapter 1</div>
+        <h2 class="section-title">The Billion-Dollar Question</h2>
+        <p class="section-subtitle">NBA teams collectively spend over $4 billion annually on player salaries. But are they getting proportional on-court performance for that investment?</p>
+
+        <div class="story-block">
+            <h3>Why This Matters</h3>
+            <p>Not all high-paid players deliver proportional performance. A player earning $50M might produce less impact than one earning $5M. Understanding this gap is critical for team management, coaches, scouts, and fantasy analysts.</p>
+            <p>This project investigates that relationship across two phases: first understanding the performance landscape, then overlaying salary data to identify undervalued and overpaid players.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number orange">590</div>
+                <div class="stat-label">Players Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number blue">32</div>
+                <div class="stat-label">Statistical Attributes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number green">5</div>
+                <div class="stat-label">Positions Compared</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number teal">$4B+</div>
+                <div class="stat-label">Total NBA Payroll</div>
+            </div>
+        </div>
+
+        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1.2rem; margin-top:2.5rem;">Core Questions</h3>
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-icon metric">1</div>
+                <h4>Who are the top performers?</h4>
+                <p>Identify the elite players of the 2024-25 season by examining PER, PTS, AST, TRB, and other key metrics.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon team">2</div>
+                <h4>How does performance vary by position?</h4>
+                <p>Compare Point Guards vs. Shooting Guards vs. Small Forwards vs. Power Forwards vs. Centers across all stats.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon steal">3</div>
+                <h4>Which metrics predict efficiency?</h4>
+                <p>Determine which performance metrics correlate most strongly with Player Efficiency Rating (PER).</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon overpaid">4</div>
+                <h4>Who is overpaid or undervalued?</h4>
+                <p>Overlay salary data to find players delivering outsized value and those falling short of their contracts.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ DATA ═══════════════ -->
+<div class="divider"></div>
+<section id="data">
+    <div class="container fade-in">
+        <div class="section-label">Chapter 2</div>
+        <h2 class="section-title">The Data Pipeline</h2>
+        <p class="section-subtitle">From raw Kaggle CSVs to cleaned, merged, and enriched datasets ready for visualization and analysis.</p>
+
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="pipeline-node">Kaggle CSVs</div>
+                <span class="pipeline-arrow">→</span>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">Google Colab</div>
+                <span class="pipeline-arrow">→</span>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node active">Data Cleaning</div>
+                <span class="pipeline-arrow">→</span>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">Merge &amp; Enrich</div>
+                <span class="pipeline-arrow">→</span>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node active">Tableau + Power BI + Plotly</div>
+            </div>
+        </div>
+
+        <div class="insights-grid" style="margin-top:2.5rem;">
+            <div class="story-block" style="margin:0;">
+                <h3>Dataset 1: Player Stats</h3>
+                <p><strong>Source:</strong> Kaggle (ratin21) — NBA Player Stats 2024-25 Per Game</p>
+                <p><strong>Size:</strong> 735 rows × 30+ columns (raw)</p>
+                <p><strong>Key columns:</strong> Player, Pos, Team, Age, G, PTS, TRB, AST, STL, BLK, FG%, 3P%, FT%, PER, USG%</p>
+            </div>
+            <div class="story-block" style="margin:0;">
+                <h3>Dataset 2: Player Salaries</h3>
+                <p><strong>Source:</strong> Kaggle (ratin21) — NBA Player Salaries 2024-25</p>
+                <p><strong>Size:</strong> ~500 rows × 5 columns</p>
+                <p><strong>Key columns:</strong> Player, Team, Salary ($), Contract Year</p>
+            </div>
+        </div>
+
+        <div class="story-block" style="margin-top:2rem;">
+            <h3>Data Cleaning Pipeline (Python / Pandas)</h3>
+            <p><strong>1.</strong> Handled traded players — kept TOT (Total) rows for full-season stats</p>
+            <p><strong>2.</strong> Filtered for statistical significance: minimum 15 games played</p>
+            <p><strong>3.</strong> Standardized positions to 5 categories: PG, SG, SF, PF, C</p>
+            <p><strong>4.</strong> Converted all statistics to numeric format</p>
+            <p><strong>5.</strong> Merged per-game stats with advanced metrics (PER, USG%)</p>
+            <p><strong>6.</strong> Removed missing values and duplicates</p>
+            <p style="margin-top:.75rem; color: var(--accent); font-weight: 600;">Final cleaned dataset: 590 players × 32 attributes</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ PROJECT 1 ═══════════════ -->
+<div class="divider"></div>
+<section id="project1">
+    <div class="container fade-in">
+        <div class="section-label">Chapter 3</div>
+        <h2 class="section-title">Understanding the Performance Landscape</h2>
+        <p class="section-subtitle">Before analyzing salary efficiency, we must first understand: Who are the top performers? How do stats vary by position and role?</p>
+
+        <div class="story-block">
+            <h3>Positional Scoring Breakdown</h3>
+            <p>Point Guards (PG) lead all positions at <strong style="color:var(--accent)">10.52 avg PPG</strong>, confirming their primary ball-handling and scoring role. Power Forwards rank second at 10.05 PPG — reflecting the evolution of the stretch big man in modern NBA. Centers have the lowest average at 8.63 PPG, as their role emphasizes interior defense and rebounding.</p>
+            <p>The gap between highest (PG: 10.52) and lowest (C: 8.63) is only <strong>~1.9 points</strong> — scoring is more evenly distributed across positions than commonly assumed.</p>
+        </div>
+
+        <div class="story-block">
+            <h3>Beyond Averages: The Full Distribution</h3>
+            <p>Bar charts only show averages. Box plots reveal the full story — range, outliers, and spread. PG has the highest median and widest spread: from bench players (3-4 PPG) to superstars (32+ PPG), showing the biggest performance gap of any position.</p>
+            <p>Centers show a tight cluster at lower values, with a few elite exceptions like <strong>Nikola Jokic (29.6 PPG)</strong> as clear outliers. Every position has significant variance — no position is uniformly high or low scoring.</p>
+        </div>
+
+        <div class="story-block">
+            <h3>Correlation Findings</h3>
+            <p>PER correlates strongly with scoring ability (<strong style="color:var(--green)">r = 0.72</strong>), high Usage Rate correlates with higher scoring (<strong style="color:var(--green)">r = 0.68</strong>), and Assists correlate with team offensive efficiency (<strong style="color:var(--blue)">r = 0.56</strong>).</p>
+            <p>Interestingly, the most efficient players aren't always those with the highest usage — suggesting that ball-dominant players face diminishing returns on efficiency.</p>
+        </div>
+
+        <!-- Tableau Dashboard Embed - Project 1 -->
+        <div class="dashboard-frame">
+            <div class="dashboard-label">
+                <div class="dot"></div>
+                <span>Live Dashboard — Tableau Public (Project 1: Performance Analysis)</span>
+            </div>
+            <iframe
+                src="https://public.tableau.com/views/Project1SDV/NBAPlayerPerformanceDashboard2024-25?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                loading="lazy"
+                title="NBA Player Performance Dashboard 2024-25">
+            </iframe>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number orange">10.52</div>
+                <div class="stat-label">PG Avg PPG (Highest)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number blue">8.63</div>
+                <div class="stat-label">C Avg PPG (Lowest)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number green">0.72</div>
+                <div class="stat-label">PER ↔ Scoring Correlation</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number teal">0.68</div>
+                <div class="stat-label">USG% ↔ Scoring Correlation</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ PROJECT 2 ═══════════════ -->
+<div class="divider"></div>
+<section id="project2">
+    <div class="container fade-in">
+        <div class="section-label">Chapter 4</div>
+        <h2 class="section-title">The Money Question: Salary vs. Performance</h2>
+        <p class="section-subtitle">Now we introduce the financial dimension. Which players deliver the best bang for the buck — and which teams spend wisely?</p>
+
+        <div class="story-block">
+            <h3>Methodology: Building the Value Model</h3>
+            <p>We merged salary data with performance stats by normalizing player names and team codes. Players were filtered to rotation-level contributors: <strong>≥40 games, ≥20 MPG, ≥$0.5M salary</strong> — yielding ~200 meaningful comparisons.</p>
+            <p>A <strong>degree-2 polynomial regression</strong> model predicts Expected PER from salary. The difference — <strong style="color:var(--accent)">Efficiency Surplus = Actual PER − Expected PER</strong> — reveals who outperforms or underperforms their contract.</p>
+        </div>
+
+        <div class="code-section">
+            <div class="code-header">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                <span class="code-filename">part_2.py — Data Merging & Value Model</span>
+            </div>
+            <div class="code-body"><pre><span class="cm"># Name normalization for reliable cross-dataset matching</span>
+<span class="kw">def</span> <span class="fn">norm_name</span>(n):
+    <span class="kw">if</span> pd.isna(n): <span class="kw">return</span> np.nan
+    n = re.sub(<span class="str">r'[.]+'</span>, <span class="str">''</span>, <span class="fn">str</span>(n).strip())
+    <span class="kw">return</span> re.sub(<span class="str">r'\s+'</span>, <span class="str">' '</span>, n).lower()
+
+<span class="cm"># Team abbreviation mapping (handle inconsistencies)</span>
+tmap = {<span class="str">'PHO'</span>: <span class="str">'PHX'</span>, <span class="str">'GS'</span>: <span class="str">'GSW'</span>, <span class="str">'NO'</span>: <span class="str">'NOP'</span>,
+        <span class="str">'NY'</span>: <span class="str">'NYK'</span>, <span class="str">'SA'</span>: <span class="str">'SAS'</span>}
+
+<span class="cm"># Merge on player name + team, with fallback to name-only</span>
+merged = stats.merge(slim, on=[<span class="str">'_key'</span>, <span class="str">'Team'</span>], how=<span class="str">'inner'</span>)
+
+<span class="cm"># Filter to rotation-level contributors</span>
+merged = merged[
+    (merged[<span class="str">'G'</span>] >= <span class="num">40</span>) &
+    (merged[<span class="str">'MP'</span>] >= <span class="num">20</span>) &
+    (merged[<span class="str">'Salary_Millions'</span>] >= <span class="num">0.5</span>)
+].copy()</pre></div>
+        </div>
+
+        <div class="code-section">
+            <div class="code-header">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                <span class="code-filename">part_2.py — Efficiency Surplus & Value Labels</span>
+            </div>
+            <div class="code-body"><pre><span class="cm"># Polynomial regression: salary → expected PER</span>
+model = <span class="fn">make_pipeline</span>(<span class="fn">PolynomialFeatures</span>(<span class="num">2</span>), <span class="fn">LinearRegression</span>())
+model.<span class="fn">fit</span>(X, y)
+
+<span class="cm"># Core value metric</span>
+merged[<span class="str">'Expected_PER'</span>] = model.<span class="fn">predict</span>(X)
+merged[<span class="str">'Efficiency_Surplus'</span>] = (merged[<span class="str">'PER'</span>] - merged[<span class="str">'Expected_PER'</span>]).round(<span class="num">2</span>)
+merged[<span class="str">'PVI'</span>] = (merged[<span class="str">'PER'</span>] + merged[<span class="str">'USG%'</span>]) / merged[<span class="str">'Salary_Millions'</span>]
+
+<span class="cm"># Salary tiers</span>
+<span class="kw">def</span> <span class="fn">stier</span>(m):
+    <span class="kw">if</span> m >= <span class="num">25</span>: <span class="kw">return</span> <span class="str">'Superstar (>=25M)'</span>
+    <span class="kw">if</span> m >= <span class="num">15</span>: <span class="kw">return</span> <span class="str">'Star (15-25M)'</span>
+    <span class="kw">if</span> m >= <span class="num">5</span>:  <span class="kw">return</span> <span class="str">'Role Player (5-15M)'</span>
+    <span class="kw">return</span> <span class="str">'Minimum/Vet (&lt;5M)'</span>
+
+<span class="cm"># Value classification based on efficiency surplus</span>
+<span class="kw">def</span> <span class="fn">vlabel</span>(s):
+    <span class="kw">if</span> s >= <span class="num">4</span>:    <span class="kw">return</span> <span class="str">'STEAL'</span>         <span class="cm"># Massively outperforming contract</span>
+    <span class="kw">if</span> s >= <span class="num">1.5</span>:  <span class="kw">return</span> <span class="str">'Undervalued'</span>
+    <span class="kw">if</span> s >= <span class="num">-1.5</span>: <span class="kw">return</span> <span class="str">'Fair Value'</span>
+    <span class="kw">if</span> s >= <span class="num">-4</span>:   <span class="kw">return</span> <span class="str">'Overpaid'</span>
+    <span class="kw">return</span> <span class="str">'WAY Overpaid'</span>      <span class="cm"># Significantly underperforming</span></pre></div>
+        </div>
+
+        <!-- Tableau Dashboard Embed - Project 2 -->
+        <div class="dashboard-frame">
+            <div class="dashboard-label">
+                <div class="dot"></div>
+                <span>Live Dashboard — Tableau Public (Project 2: Salary Efficiency)</span>
+            </div>
+            <iframe
+                src="https://public.tableau.com/views/Project2_17761394439140/Dashboard1?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                loading="lazy"
+                title="NBA Salary Efficiency Dashboard">
+            </iframe>
+        </div>
+
+        <!-- Top Value Players Table -->
+        <h3 style="font-size:1.2rem; font-weight:700; margin:3rem 0 1rem;">Top 10 Value Players (Biggest Steals)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Pos</th>
+                        <th>Salary ($M)</th>
+                        <th>PER</th>
+                        <th>Expected PER</th>
+                        <th>Surplus</th>
+                        <th>Tier</th>
+                        <th>Label</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td><strong>Shai Gilgeous-Alexander</strong></td><td>OKC</td><td>PG</td><td>$35.86</td><td>30.7</td><td>18.69</td><td style="color:#4ade80;font-weight:700">+12.01</td><td>Superstar</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>2</td><td><strong>Nikola Jokic</strong></td><td>DEN</td><td>C</td><td>$51.42</td><td>32.0</td><td>21.40</td><td style="color:#4ade80;font-weight:700">+10.60</td><td>Superstar</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>3</td><td><strong>Mark Williams</strong></td><td>CHO</td><td>C</td><td>$4.09</td><td>23.9</td><td>13.35</td><td style="color:#4ade80;font-weight:700">+10.55</td><td>Min/Vet</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>4</td><td><strong>Daniel Gafford</strong></td><td>DAL</td><td>C</td><td>$13.39</td><td>24.7</td><td>14.89</td><td style="color:#4ade80;font-weight:700">+9.81</td><td>Role Player</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>5</td><td><strong>Giannis Antetokounmpo</strong></td><td>MIL</td><td>PF</td><td>$48.79</td><td>30.5</td><td>20.94</td><td style="color:#4ade80;font-weight:700">+9.56</td><td>Superstar</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>6</td><td><strong>Victor Wembanyama</strong></td><td>SAS</td><td>C</td><td>$12.77</td><td>24.2</td><td>14.79</td><td style="color:#4ade80;font-weight:700">+9.41</td><td>Role Player</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>7</td><td><strong>Jalen Duren</strong></td><td>DET</td><td>C</td><td>$4.54</td><td>21.4</td><td>13.43</td><td style="color:#4ade80;font-weight:700">+7.97</td><td>Min/Vet</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>8</td><td><strong>Alperen Sengun</strong></td><td>HOU</td><td>C</td><td>$5.42</td><td>21.4</td><td>13.57</td><td style="color:#4ade80;font-weight:700">+7.83</td><td>Role Player</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>9</td><td><strong>Evan Mobley</strong></td><td>CLE</td><td>PF</td><td>$11.23</td><td>22.3</td><td>14.53</td><td style="color:#4ade80;font-weight:700">+7.77</td><td>Role Player</td><td><span class="label-steal">STEAL</span></td></tr>
+                    <tr><td>10</td><td><strong>Ivica Zubac</strong></td><td>LAC</td><td>C</td><td>$11.74</td><td>22.3</td><td>14.62</td><td style="color:#4ade80;font-weight:700">+7.68</td><td>Role Player</td><td><span class="label-steal">STEAL</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Most Overpaid Players -->
+        <h3 style="font-size:1.2rem; font-weight:700; margin:3rem 0 1rem;">Bottom 5: Most Overpaid Players</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Pos</th>
+                        <th>Salary ($M)</th>
+                        <th>PER</th>
+                        <th>Expected PER</th>
+                        <th>Surplus</th>
+                        <th>Label</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Cody Williams</strong></td><td>UTA</td><td>SG</td><td>$5.47</td><td>3.7</td><td>13.58</td><td style="color:#f87171;font-weight:700">-9.88</td><td><span class="label-overpaid">WAY Overpaid</span></td></tr>
+                    <tr><td><strong>Gabe Vincent</strong></td><td>LAL</td><td>PG</td><td>$11.00</td><td>7.4</td><td>14.49</td><td style="color:#f87171;font-weight:700">-7.09</td><td><span class="label-overpaid">WAY Overpaid</span></td></tr>
+                    <tr><td><strong>Fred VanVleet</strong></td><td>HOU</td><td>PG</td><td>$42.85</td><td>12.8</td><td>19.90</td><td style="color:#f87171;font-weight:700">-7.10</td><td><span class="label-overpaid">WAY Overpaid</span></td></tr>
+                    <tr><td><strong>Josh Green</strong></td><td>CHO</td><td>SG</td><td>$12.65</td><td>7.8</td><td>14.77</td><td style="color:#f87171;font-weight:700">-6.97</td><td><span class="label-overpaid">WAY Overpaid</span></td></tr>
+                    <tr><td><strong>Jerami Grant</strong></td><td>POR</td><td>PF</td><td>$29.79</td><td>10.9</td><td>17.65</td><td style="color:#f87171;font-weight:700">-6.75</td><td><span class="label-overpaid">WAY Overpaid</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ KEY FINDINGS ═══════════════ -->
+<div class="divider"></div>
+<section id="findings">
+    <div class="container fade-in">
+        <div class="section-label">Chapter 5</div>
+        <h2 class="section-title">Key Discoveries</h2>
+        <p class="section-subtitle">The insights that emerge when performance data meets salary data — revealing the true value landscape of the NBA.</p>
+
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-icon steal">&#9733;</div>
+                <h4>SGA: The League's Best Value</h4>
+                <p>Shai Gilgeous-Alexander earns $35.9M but plays like a $60M+ player. His +12.01 Efficiency Surplus is the highest in the league — elite performance at a relative discount.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon steal">&#9733;</div>
+                <h4>Rookie-Scale Goldmine</h4>
+                <p>Players on rookie contracts (Mark Williams, Jalen Duren, Wembanyama) dominate the "STEAL" category. Young talent on cheap deals is the NBA's most reliable value source.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon team">&#9878;</div>
+                <h4>OKC: Smartest Spenders</h4>
+                <p>Oklahoma City leads all teams with +2.22 average Efficiency Surplus. Their roster construction maximizes performance per dollar invested.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon overpaid">&#9888;</div>
+                <h4>Washington: Worst ROI</h4>
+                <p>The Wizards have the lowest team surplus at -2.05, suggesting systemic overpayment across their roster relative to on-court production.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon metric">&#9881;</div>
+                <h4>Centers Dominate Value</h4>
+                <p>7 of the top 10 "steals" play center — the position with the lowest average salary but consistently high PER, making them the league's most efficient investment.</p>
+            </div>
+            <div class="insight-card">
+                <div class="insight-icon overpaid">&#9888;</div>
+                <h4>Max Contracts ≠ Max Value</h4>
+                <p>Several max-contract players (Beal, George, VanVleet) fall into "WAY Overpaid" territory, proving that the biggest contracts carry the biggest risk of negative surplus.</p>
+            </div>
+        </div>
+
+        <div class="story-block" style="margin-top:2rem;">
+            <h3>The Bottom Line</h3>
+            <p>Higher salary does predict higher PER — but only weakly. The polynomial model explains limited variance (R² ≈ 0.25), meaning <strong>75% of a player's efficiency is NOT explained by their salary</strong>. Teams that identify this gap early gain a significant competitive advantage.</p>
+            <p>The "sweet spot" for value is the <strong>$3M–$15M salary range</strong>, where many role players and young stars dramatically outperform expectations. The superstar tier ($25M+) is a high-risk, high-variance bet.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ TOOLS ═══════════════ -->
+<div class="divider"></div>
+<section id="tools">
+    <div class="container fade-in">
+        <div class="section-label">Technology</div>
+        <h2 class="section-title">Tools &amp; Technologies</h2>
+        <p class="section-subtitle">A full-stack data science and visualization pipeline, from cleaning through interactive dashboards.</p>
+
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h4>Python (Google Colab)</h4>
+                <p>Pandas for data loading, cleaning, merging, and filtering. NumPy for numerical operations. Scikit-learn for polynomial regression modeling.</p>
+            </div>
+            <div class="tool-card">
+                <h4>Matplotlib &amp; Seaborn</h4>
+                <p>8 static visualizations covering scoring distributions, positional box plots, correlation heatmaps, and scatter plots.</p>
+            </div>
+            <div class="tool-card">
+                <h4>Tableau Public</h4>
+                <p>Interactive dashboards with bar charts, box plots, scatter plots, and combined performance views. Published publicly for accessibility.</p>
+            </div>
+            <div class="tool-card">
+                <h4>Microsoft Power BI</h4>
+                <p>Clustered column charts, cross-tool validation, and business-intelligence-style dashboard for positional analysis.</p>
+            </div>
+            <div class="tool-card">
+                <h4>Plotly (Interactive)</h4>
+                <p>5 interactive charts: salary vs PER bubble chart, efficiency surplus scatter, value leaderboard table, team analysis bar &amp; scatter plots.</p>
+            </div>
+            <div class="tool-card">
+                <h4>HTML / CSS</h4>
+                <p>Self-contained interactive dashboard (nba_salary_dashboard.html) and this storytelling presentation webpage.</p>
+            </div>
+        </div>
+
+        <div class="story-block" style="margin-top:2rem;">
+            <h3>Data Flow Summary</h3>
+            <p style="font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--accent);">
+                Raw CSVs → Python Cleaning → Cleaned CSV → Tableau + Power BI → Static Dashboards<br>
+                Cleaned CSV + Salary CSV → Python Merging → Enriched CSV → Plotly → Interactive Dashboard
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ INTERACTIVE DASHBOARD LINK ═══════════════ -->
+<div class="divider"></div>
+<section>
+    <div class="container fade-in" style="text-align:center;">
+        <div class="section-label">Explore Further</div>
+        <h2 class="section-title" style="margin-bottom:1.5rem;">Interactive Dashboards</h2>
+        <p class="section-subtitle" style="margin: 0 auto 2rem;">View the full interactive dashboards on Tableau Public, or open the Plotly-powered salary efficiency dashboard.</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project1SDV/NBAPlayerPerformanceDashboard2024-25" target="_blank" rel="noopener" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--accent),#ea580c); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Tableau — Project 1</a>
+            <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project2_17761394439140/Dashboard1" target="_blank" rel="noopener" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--blue),#2563eb); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Tableau — Project 2</a>
+            <a href="nba_salary_dashboard.html" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--teal),#0d9488); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Plotly Dashboard</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+    <p><strong>CSCE 5320 &middot; Scientific Data Visualization</strong></p>
+    <p style="margin-top:.5rem;">Abhijit Sappidi &middot; 11723306 &middot; 2024-25 NBA Season Analysis</p>
+    <p style="margin-top:.5rem;">Data: <a href="https://www.kaggle.com/datasets/ratin21/nba-player-stats-2024-25-per-game" target="_blank">Kaggle — NBA Player Stats</a> &middot; <a href="https://www.kaggle.com/datasets/ratin21/nba-player-salaries-2024-25" target="_blank">Kaggle — NBA Salaries</a></p>
+</footer>
+
+<script>
+// Scroll-triggered fade-in animations
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Navbar shadow on scroll
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Active nav link highlighting
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY + 100;
+    sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        const id = section.getAttribute('id');
+        const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+        if (link) {
+            link.classList.toggle('active', scrollY >= top && scrollY < top + height);
+        }
+    });
+});
+</script>
+
+</body>
+</html>
