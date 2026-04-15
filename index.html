@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Player Value — Performance Metrics &amp; Salary Efficiency</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -23,7 +23,6 @@
             --text-muted: #94a3b8;
             --text-dim: #64748b;
             --border: #1e293b;
-            --code-bg: #0d1117;
         }
 
         html { scroll-behavior: smooth; }
@@ -160,37 +159,6 @@
             font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;
         }
         .story-block p { color: var(--text-muted); margin-bottom: .75rem; }
-
-        /* ── CODE BLOCKS ── */
-        .code-section {
-            background: var(--code-bg); border: 1px solid var(--border);
-            border-radius: 16px; overflow: hidden; margin: 2rem 0;
-        }
-        .code-header {
-            display: flex; align-items: center; gap: .75rem;
-            padding: .75rem 1.25rem; background: #161b22; border-bottom: 1px solid var(--border);
-        }
-        .code-dot {
-            width: 12px; height: 12px; border-radius: 50%;
-        }
-        .code-dot.red { background: #ff5f57; }
-        .code-dot.yellow { background: #febc2e; }
-        .code-dot.green { background: #28c840; }
-        .code-filename {
-            margin-left: .5rem; font-size: .8rem; color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .code-body {
-            padding: 1.25rem 1.5rem; overflow-x: auto; font-size: .82rem;
-            line-height: 1.8; font-family: 'JetBrains Mono', monospace;
-            color: #c9d1d9;
-        }
-        .code-body .kw { color: #ff7b72; }
-        .code-body .fn { color: #d2a8ff; }
-        .code-body .str { color: #a5d6ff; }
-        .code-body .cm { color: #8b949e; font-style: italic; }
-        .code-body .num { color: #79c0ff; }
-        .code-body .op { color: #ff7b72; }
 
         /* ── TABLEAU EMBED ── */
         .dashboard-frame {
@@ -559,64 +527,16 @@
             <p>A <strong>degree-2 polynomial regression</strong> model predicts Expected PER from salary. The difference — <strong style="color:var(--accent)">Efficiency Surplus = Actual PER − Expected PER</strong> — reveals who outperforms or underperforms their contract.</p>
         </div>
 
-        <div class="code-section">
-            <div class="code-header">
-                <div class="code-dot red"></div>
-                <div class="code-dot yellow"></div>
-                <div class="code-dot green"></div>
-                <span class="code-filename">part_2.py — Data Merging & Value Model</span>
-            </div>
-            <div class="code-body"><pre><span class="cm"># Name normalization for reliable cross-dataset matching</span>
-<span class="kw">def</span> <span class="fn">norm_name</span>(n):
-    <span class="kw">if</span> pd.isna(n): <span class="kw">return</span> np.nan
-    n = re.sub(<span class="str">r'[.]+'</span>, <span class="str">''</span>, <span class="fn">str</span>(n).strip())
-    <span class="kw">return</span> re.sub(<span class="str">r'\s+'</span>, <span class="str">' '</span>, n).lower()
-
-<span class="cm"># Team abbreviation mapping (handle inconsistencies)</span>
-tmap = {<span class="str">'PHO'</span>: <span class="str">'PHX'</span>, <span class="str">'GS'</span>: <span class="str">'GSW'</span>, <span class="str">'NO'</span>: <span class="str">'NOP'</span>,
-        <span class="str">'NY'</span>: <span class="str">'NYK'</span>, <span class="str">'SA'</span>: <span class="str">'SAS'</span>}
-
-<span class="cm"># Merge on player name + team, with fallback to name-only</span>
-merged = stats.merge(slim, on=[<span class="str">'_key'</span>, <span class="str">'Team'</span>], how=<span class="str">'inner'</span>)
-
-<span class="cm"># Filter to rotation-level contributors</span>
-merged = merged[
-    (merged[<span class="str">'G'</span>] >= <span class="num">40</span>) &
-    (merged[<span class="str">'MP'</span>] >= <span class="num">20</span>) &
-    (merged[<span class="str">'Salary_Millions'</span>] >= <span class="num">0.5</span>)
-].copy()</pre></div>
+        <div class="story-block">
+            <h3>How We Classified Player Value</h3>
+            <p>Players were segmented into four salary tiers: <strong style="color:#e63946">Superstars ($25M+)</strong>, <strong style="color:#f4a261">Stars ($15–25M)</strong>, <strong style="color:#2a9d8f">Role Players ($5–15M)</strong>, and <strong style="color:#457b9d">Minimum/Vet (&lt;$5M)</strong>. Each tier carries different expectations for on-court production.</p>
+            <p>Based on the gap between actual and expected PER, every player received a value label: <strong style="color:#4ade80">STEAL</strong> (surplus ≥ 4), <strong style="color:#2a9d8f">Undervalued</strong> (≥ 1.5), <strong style="color:#94a3b8">Fair Value</strong> (± 1.5), <strong style="color:#f4a261">Overpaid</strong> (≤ -1.5), or <strong style="color:#f87171">WAY Overpaid</strong> (≤ -4). This framework turns abstract salary numbers into actionable intelligence for team decision-makers.</p>
         </div>
 
-        <div class="code-section">
-            <div class="code-header">
-                <div class="code-dot red"></div>
-                <div class="code-dot yellow"></div>
-                <div class="code-dot green"></div>
-                <span class="code-filename">part_2.py — Efficiency Surplus & Value Labels</span>
-            </div>
-            <div class="code-body"><pre><span class="cm"># Polynomial regression: salary → expected PER</span>
-model = <span class="fn">make_pipeline</span>(<span class="fn">PolynomialFeatures</span>(<span class="num">2</span>), <span class="fn">LinearRegression</span>())
-model.<span class="fn">fit</span>(X, y)
-
-<span class="cm"># Core value metric</span>
-merged[<span class="str">'Expected_PER'</span>] = model.<span class="fn">predict</span>(X)
-merged[<span class="str">'Efficiency_Surplus'</span>] = (merged[<span class="str">'PER'</span>] - merged[<span class="str">'Expected_PER'</span>]).round(<span class="num">2</span>)
-merged[<span class="str">'PVI'</span>] = (merged[<span class="str">'PER'</span>] + merged[<span class="str">'USG%'</span>]) / merged[<span class="str">'Salary_Millions'</span>]
-
-<span class="cm"># Salary tiers</span>
-<span class="kw">def</span> <span class="fn">stier</span>(m):
-    <span class="kw">if</span> m >= <span class="num">25</span>: <span class="kw">return</span> <span class="str">'Superstar (>=25M)'</span>
-    <span class="kw">if</span> m >= <span class="num">15</span>: <span class="kw">return</span> <span class="str">'Star (15-25M)'</span>
-    <span class="kw">if</span> m >= <span class="num">5</span>:  <span class="kw">return</span> <span class="str">'Role Player (5-15M)'</span>
-    <span class="kw">return</span> <span class="str">'Minimum/Vet (&lt;5M)'</span>
-
-<span class="cm"># Value classification based on efficiency surplus</span>
-<span class="kw">def</span> <span class="fn">vlabel</span>(s):
-    <span class="kw">if</span> s >= <span class="num">4</span>:    <span class="kw">return</span> <span class="str">'STEAL'</span>         <span class="cm"># Massively outperforming contract</span>
-    <span class="kw">if</span> s >= <span class="num">1.5</span>:  <span class="kw">return</span> <span class="str">'Undervalued'</span>
-    <span class="kw">if</span> s >= <span class="num">-1.5</span>: <span class="kw">return</span> <span class="str">'Fair Value'</span>
-    <span class="kw">if</span> s >= <span class="num">-4</span>:   <span class="kw">return</span> <span class="str">'Overpaid'</span>
-    <span class="kw">return</span> <span class="str">'WAY Overpaid'</span>      <span class="cm"># Significantly underperforming</span></pre></div>
+        <div class="story-block">
+            <h3>Key Derived Metrics</h3>
+            <p><strong>Performance Value Index (PVI)</strong> = (PER + Usage Rate) / Salary in Millions — a single number capturing how much production a team receives per dollar invested.</p>
+            <p><strong>Efficiency Surplus</strong> = Actual PER − Expected PER — the core metric revealing whether a player over-delivers or under-delivers relative to their salary. Positive values mean the player outperforms their contract; negative values indicate overpayment.</p>
         </div>
 
         <!-- Tableau Dashboard Embed - Project 2 -->
@@ -626,7 +546,7 @@ merged[<span class="str">'PVI'</span>] = (merged[<span class="str">'PER'</span>]
                 <span>Live Dashboard — Tableau Public (Project 2: Salary Efficiency)</span>
             </div>
             <iframe
-                src="https://public.tableau.com/views/Project2_17761394439140/Dashboard1?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                src="https://public.tableau.com/views/Project2-1_17762938665760/Dashboard1?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
                 loading="lazy"
                 title="NBA Salary Efficiency Dashboard">
             </iframe>
@@ -779,7 +699,7 @@ merged[<span class="str">'PVI'</span>] = (merged[<span class="str">'PER'</span>]
 
         <div class="story-block" style="margin-top:2rem;">
             <h3>Data Flow Summary</h3>
-            <p style="font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--accent);">
+            <p style="font-size: .9rem; color: var(--accent); font-weight: 600; letter-spacing: .01em;">
                 Raw CSVs → Python Cleaning → Cleaned CSV → Tableau + Power BI → Static Dashboards<br>
                 Cleaned CSV + Salary CSV → Python Merging → Enriched CSV → Plotly → Interactive Dashboard
             </p>
@@ -796,7 +716,7 @@ merged[<span class="str">'PVI'</span>] = (merged[<span class="str">'PER'</span>]
         <p class="section-subtitle" style="margin: 0 auto 2rem;">View the full interactive dashboards on Tableau Public, or open the Plotly-powered salary efficiency dashboard.</p>
         <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
             <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project1SDV/NBAPlayerPerformanceDashboard2024-25" target="_blank" rel="noopener" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--accent),#ea580c); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Tableau — Project 1</a>
-            <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project2_17761394439140/Dashboard1" target="_blank" rel="noopener" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--blue),#2563eb); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Tableau — Project 2</a>
+            <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project2-1_17762938665760/Dashboard1" target="_blank" rel="noopener" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--blue),#2563eb); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Tableau — Project 2</a>
             <a href="nba_salary_dashboard.html" style="display:inline-block; padding:.85rem 2rem; background:linear-gradient(135deg,var(--teal),#0d9488); color:#fff; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; transition:transform .2s;">Plotly Dashboard</a>
         </div>
     </div>
