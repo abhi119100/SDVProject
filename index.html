@@ -833,6 +833,7 @@
             <p><strong>5.</strong> Merged per-game stats with advanced metrics (PER, USG%)</p>
             <p><strong>6.</strong> Removed missing values and duplicates</p>
             <p style="margin-top:.75rem; color: var(--accent); font-weight: 700; font-family:'Oswald',sans-serif; font-size:1rem; text-transform:uppercase;">Final cleaned dataset: 590 players × 32 attributes</p>
+            <p style="margin-top:.75rem;"><a href="https://colab.research.google.com/drive/120LIrDY7E4Rv74QtGQCaO8xlsG3Kqzvd" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:.4rem; color:var(--accent); font-weight:600; text-decoration:none; font-size:.88rem; transition:color .2s;">&#128209; View Full Pipeline on Google Colab <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></p>
         </div>
     </div>
 </section>
@@ -921,6 +922,27 @@
             <h3>Key Derived Metrics</h3>
             <p><strong>Performance Value Index (PVI)</strong> = (PER + Usage Rate) / Salary in Millions — a single number capturing how much production a team receives per dollar invested.</p>
             <p><strong>Efficiency Surplus</strong> = Actual PER &#8722; Expected PER — the core metric revealing whether a player over-delivers or under-delivers relative to their salary.</p>
+            <p style="margin-top:1rem;"><a href="https://colab.research.google.com/drive/120LIrDY7E4Rv74QtGQCaO8xlsG3Kqzvd" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:.4rem; color:var(--accent); font-weight:600; text-decoration:none; font-size:.88rem; transition:color .2s;">&#128209; View Full Python Analysis on Google Colab <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></p>
+        </div>
+
+        <!-- Plotly Analysis Output -->
+        <h3 style="font-family:'Oswald',sans-serif; font-size:1.15rem; font-weight:600; margin:2.5rem 0 1rem; text-transform:uppercase; letter-spacing:.03em;" class="fade-in">&#128202; Plotly Analysis Output <span style="font-family:'Inter',sans-serif; font-size:.75rem; color:var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0; margin-left:.5rem;">from <a href="https://colab.research.google.com/drive/120LIrDY7E4Rv74QtGQCaO8xlsG3Kqzvd" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Google Colab Notebook</a></span></h3>
+
+        <div class="evidence-grid fade-in">
+            <div class="evidence-card">
+                <div class="evidence-card-label">&#127936; Salary vs PER (Bubble Size = Usage Rate)</div>
+                <img src="plotly-salary-vs-per.png" alt="Plotly bubble chart showing Salary in Millions vs PER, colored by Salary Tier (Superstar, Star, Role Player, Minimum/Vet), with bubble size representing Usage Rate">
+            </div>
+            <div class="evidence-card">
+                <div class="evidence-card-label">&#128200; Salary vs Efficiency Surplus</div>
+                <img src="plotly-efficiency-surplus.png" alt="Plotly scatter plot showing Salary in Millions vs Efficiency Surplus, colored by Value Label (STEAL, Undervalued, Fair Value, Overpaid, WAY Overpaid), with dashed zero line">
+            </div>
+        </div>
+
+        <div class="story-block fade-in">
+            <h3>Reading the Plotly Charts</h3>
+            <p>The <strong>Salary vs PER</strong> bubble chart reveals the core relationship: as salary increases, PER generally rises — but with enormous variance. Bubble size encodes Usage Rate, showing that the highest-usage players tend to cluster in the upper-right (high salary, high PER), but several low-salary players punch well above their weight class. The color-coded salary tiers make the pattern clear: <strong style="color:#457b9d">Minimum/Vet players</strong> are tightly packed at lower PER, while <strong style="color:#e63946">Superstars</strong> spread across a wide PER range.</p>
+            <p>The <strong>Efficiency Surplus</strong> chart is the payoff: players above the dashed zero line outperform their contract, those below underperform. <strong style="color:#4ade80">STEAL</strong> players (dark green) cluster well above zero even at varying salaries, while <strong style="color:#f87171">WAY Overpaid</strong> players (red) sink well below — regardless of how much they earn. This visualization directly powered the player rankings in the next section.</p>
         </div>
 
         <div class="dashboard-frame">
@@ -1409,6 +1431,7 @@
             <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project1SDV/NBAPlayerPerformanceDashboard2024-25" target="_blank" rel="noopener" class="cta-btn orange">&#127936; Tableau — Project 1</a>
             <a href="https://public.tableau.com/app/profile/abhijit.sappidi/viz/Project2-1_17762938665760/Dashboard1" target="_blank" rel="noopener" class="cta-btn blue">&#128176; Tableau — Project 2</a>
             <a href="nba_salary_dashboard.html" class="cta-btn teal">&#128202; Plotly Dashboard</a>
+            <a href="https://colab.research.google.com/drive/120LIrDY7E4Rv74QtGQCaO8xlsG3Kqzvd" target="_blank" rel="noopener" class="cta-btn orange" style="background:linear-gradient(135deg,#fbbf24,#f97316);">&#128209; Google Colab Notebook</a>
         </div>
     </div>
 </section>
