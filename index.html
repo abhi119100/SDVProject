@@ -465,43 +465,7 @@
         .cta-btn.teal { background: linear-gradient(135deg, var(--teal), #0d9488); box-shadow: 0 4px 25px rgba(20,184,166,.3); }
         .cta-btn.teal:hover { box-shadow: 0 8px 35px rgba(20,184,166,.5); }
 
-        /* ── MVP SHOWCASE ── */
-        .mvp-section {
-            background: linear-gradient(180deg, #0d1220, #111827 30%, #111827 70%, #0d1220);
-        }
-        .mvp-hero {
-            display: flex; gap: 2.5rem; align-items: center; margin: 2.5rem 0;
-            background: linear-gradient(135deg, rgba(34,197,94,.06), rgba(249,115,22,.06));
-            border: 1px solid rgba(34,197,94,.2); border-radius: 24px;
-            padding: 2.5rem; position: relative; overflow: hidden;
-        }
-        .mvp-hero::before {
-            content: ''; position: absolute; top: -60px; right: -60px;
-            width: 200px; height: 200px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(251,191,36,.1), transparent 70%);
-        }
-        .mvp-hero-img { flex: 0 0 320px; position: relative; }
-        .mvp-hero-img img {
-            width: 100%; height: 260px; object-fit: contain;
-            filter: drop-shadow(0 8px 30px rgba(0,0,0,.4));
-        }
-        .mvp-hero-text { flex: 1; position: relative; }
-        .mvp-badge {
-            display: inline-flex; align-items: center; gap: .5rem;
-            padding: .4rem 1rem; border-radius: 50px; font-size: .75rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-            margin-bottom: 1rem;
-        }
-        .mvp-badge.gold {
-            background: linear-gradient(135deg, rgba(251,191,36,.2), rgba(249,115,22,.15));
-            border: 1px solid rgba(251,191,36,.4); color: var(--gold);
-        }
-        .mvp-hero-text h3 {
-            font-family: 'Oswald', sans-serif; font-size: 1.6rem;
-            font-weight: 700; text-transform: uppercase; margin-bottom: .75rem;
-            line-height: 1.2;
-        }
-        .mvp-hero-text p { color: var(--text-muted); margin-bottom: .6rem; font-size: .95rem; }
+        /* ── EVIDENCE GRID ── */
         .evidence-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2.5rem 0;
         }
@@ -521,32 +485,8 @@
             font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
             color: var(--accent);
         }
-        .evidence-card img {
-            width: 100%; display: block;
-        }
-        .validation-points {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1rem; margin: 2rem 0;
-        }
-        .vp-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 1.25rem;
-            display: flex; gap: 1rem; align-items: flex-start;
-            transition: border-color .3s;
-        }
-        .vp-card:hover { border-color: rgba(251,191,36,.3); }
-        .vp-num {
-            flex: 0 0 36px; height: 36px; border-radius: 8px;
-            background: linear-gradient(135deg, var(--gold), var(--accent));
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Oswald', sans-serif; font-weight: 700; font-size: .9rem;
-            color: #000;
-        }
-        .vp-card p { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
-        .vp-card strong { color: var(--text); }
+        .evidence-card img { width: 100%; display: block; }
         @media (max-width: 768px) {
-            .mvp-hero { flex-direction: column; padding: 1.5rem; }
-            .mvp-hero-img { flex: none; width: 100%; }
             .evidence-grid { grid-template-columns: 1fr; }
         }
 
@@ -620,7 +560,6 @@
             <li><a href="#project2">Salary</a></li>
             <li><a href="#steals">Steals</a></li>
             <li><a href="#findings">Findings</a></li>
-            <li><a href="#mvp">MVP</a></li>
             <li><a href="#tools">Tech</a></li>
         </ul>
     </div>
@@ -1313,64 +1252,6 @@
             <h3>The Bottom Line</h3>
             <p>Higher salary does predict higher PER — but only weakly. The polynomial model explains limited variance (R&#178; &#8776; 0.25), meaning <strong>75% of a player's efficiency is NOT explained by their salary</strong>. Teams that identify this gap early gain a significant competitive advantage.</p>
             <p>The "sweet spot" for value is the <strong>$3M–$15M salary range</strong>, where many role players and young stars dramatically outperform expectations. The superstar tier ($25M+) is a high-risk, high-variance bet.</p>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════ MVP VALIDATION ═══════════════ -->
-<div class="divider"></div>
-<section id="mvp" class="mvp-section">
-    <div class="container">
-        <div class="section-label fade-in">Validation</div>
-        <h2 class="section-title fade-in">Our Model Predicted the MVP</h2>
-        <p class="section-subtitle fade-in">The ultimate test of any analytical framework: does it agree with real-world outcomes? Ours passed.</p>
-
-        <div class="mvp-hero fade-in">
-            <div class="mvp-hero-img">
-                <img src="https://cdn.nba.com/headshots/nba/latest/1040x760/1628983.png" alt="Shai Gilgeous-Alexander — 2024-25 NBA MVP">
-            </div>
-            <div class="mvp-hero-text">
-                <div class="mvp-badge gold">&#127942; 2024-25 NBA Most Valuable Player</div>
-                <h3>Shai Gilgeous-Alexander</h3>
-                <p>In the 2024–25 season, SGA both <strong style="color:var(--gold)">topped our Efficiency Surplus rankings (#1 overall, +12.01)</strong> and actually won the NBA MVP award — proving that this project's value metric agrees with how professional journalists and voters evaluated the league's best player.</p>
-                <p>Our fully data-driven model identified the same player that the entire NBA media ecosystem voted as MVP. That's not a coincidence — it's validation.</p>
-            </div>
-        </div>
-
-        <div class="evidence-grid">
-            <div class="evidence-card fade-in">
-                <div class="evidence-card-label">&#128200; Salary vs PER — SGA's Dominance</div>
-                <img src="sga-salary-vs-per.png" alt="Salary vs PER scatter plot showing SGA as the league's most efficient player, with PER of 30.70 and Efficiency Surplus of 12.01">
-            </div>
-            <div class="evidence-card fade-in">
-                <div class="evidence-card-label">&#127942; Value Leaderboard — #1 Surplus Rank</div>
-                <img src="sga-value-leaderboard.png" alt="Value Leaderboard table showing Shai Gilgeous-Alexander at #1 with Efficiency Surplus 12.0, PER 30.7, followed by Jokic, Mark Williams, Daniel Gafford, and Giannis">
-            </div>
-        </div>
-
-        <h3 style="font-family:'Oswald',sans-serif; font-size:1.15rem; font-weight:600; margin:2.5rem 0 1rem; text-transform:uppercase;" class="fade-in">Why This Model Works</h3>
-        <div class="validation-points">
-            <div class="vp-card fade-in">
-                <div class="vp-num">1</div>
-                <p><strong>Data-Driven, Not Opinion-Based.</strong> Expected PER is computed from the league's actual PER distribution within each salary band. Efficiency Surplus comes directly from those benchmarks, not from hard-coded opinions.</p>
-            </div>
-            <div class="vp-card fade-in">
-                <div class="vp-num">2</div>
-                <p><strong>Industry-Standard Approach.</strong> This mirrors how analysts in sports and compensation build a "market value line" with regression, then measure who sits above or below — a standard and accepted method.</p>
-            </div>
-            <div class="vp-card fade-in">
-                <div class="vp-num">3</div>
-                <p><strong>Aligned with Modern Analytics.</strong> MVP discussions already rely on advanced efficiency metrics (PER, Win Shares, impact stats) plus team success. Our framework is consistent with how serious analysts think about value.</p>
-            </div>
-            <div class="vp-card fade-in">
-                <div class="vp-num">4</div>
-                <p><strong>Validated by the Real MVP.</strong> SGA's #1 ranking in our model and his actual MVP win prove the methodology captures genuine player value, not just statistical noise.</p>
-            </div>
-        </div>
-
-        <div class="story-block fade-in" style="margin-top:1.5rem; border-color:rgba(251,191,36,.25);">
-            <h3 style="color:var(--gold);">The Takeaway</h3>
-            <p>When a purely quantitative model independently identifies the same player that hundreds of professional journalists vote as MVP, it demonstrates that the analytical framework is sound, the metrics are meaningful, and the conclusions are actionable — exactly the kind of insight that teams, scouts, and analysts need to make better decisions.</p>
         </div>
     </div>
 </section>
