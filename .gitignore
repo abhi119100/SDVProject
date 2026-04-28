@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Old static HTML (replaced by React)
+index.old.html
+
+# Tableau recovery/temp files
+~*.twbr
+*.twbr
+
+# Editor artifacts
+*.swp
+*.swo
+*~
+
+# Raw screenshots (kept clean copies in assets/)
+Screenshot *.png
+image.png
