@@ -15,7 +15,7 @@ import Ticker from './components/Ticker'
 import ToolsSection from './components/ToolsSection'
 import useScrollSpy from './hooks/useScrollSpy'
 
-const SECTION_IDS = ['problem', 'data', 'project1', 'project2', 'steals', 'findings', 'tools', 'compare']
+const SECTION_IDS = ['problem', 'data', 'project1', 'project2', 'steals', 'findings', 'compare', 'tools']
 
 export default function App() {
   const activeSection = useScrollSpy(SECTION_IDS)
@@ -45,6 +45,9 @@ export default function App() {
       <FindingsSection />
 
       <div className="divider" />
+      <PlayerComparison />
+
+      <div className="divider" />
       <LimitationsSection />
 
       <div className="divider" />
@@ -52,9 +55,6 @@ export default function App() {
 
       <div className="divider" />
       <DashboardLinks />
-
-      <div className="divider" />
-      <PlayerComparison />
 
       <div className="divider" />
       <AuthorSection />
