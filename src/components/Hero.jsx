@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="hero-ball" />
 
       <div ref={ref} className={`hero-content fade-in ${isVisible ? 'visible' : ''}`}>
-        <div className="hero-badge">CSCE 5320 {'\u00B7'} Scientific Data Visualization</div>
+        <div className="hero-badge">Data Analytics {'\u00B7'} Sports Intelligence {'\u00B7'} 2024-25 Season</div>
 
         <h1>
           NBA Player <span>Value</span>

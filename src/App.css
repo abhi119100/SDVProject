@@ -70,7 +70,7 @@ nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,.5); }
     content: ''; position: absolute; bottom: -4px; left: 0;
     width: 0; height: 2px; background: var(--accent); transition: width .3s;
 }
-.nav-links a:hover::after { width: 100%; }
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
 
 /* ── HERO ── */
 .hero {
@@ -538,17 +538,53 @@ section { padding: 5rem 2rem; position: relative; }
 }
 
 /* ── FOOTER ── */
-footer {
-    text-align: center; padding: 3rem 2rem;
+.site-footer {
     border-top: 2px solid rgba(249,115,22,.2);
     color: var(--text-dim); font-size: .85rem;
     background: linear-gradient(180deg, var(--bg-dark), #060912);
 }
-footer a { color: var(--accent); text-decoration: none; }
-footer .footer-brand {
-    font-family: 'Oswald', sans-serif; font-size: 1.1rem;
-    font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
-    color: var(--text-muted); margin-bottom: .5rem;
+.site-footer a { color: var(--text-muted); text-decoration: none; transition: color .2s; }
+.site-footer a:hover { color: var(--accent); }
+
+.footer-top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    max-width: 1200px; margin: 0 auto;
+    padding: 3.5rem 2rem 2.5rem;
+}
+.footer-about p {
+    margin-top: .75rem; line-height: 1.65; color: var(--text-dim);
+}
+.footer-logo {
+    display: flex; align-items: center; gap: .5rem;
+}
+.footer-logo-icon { font-size: 1.4rem; }
+.footer-logo-text {
+    font-family: 'Oswald', sans-serif; font-size: 1.25rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--text-primary);
+}
+.footer-col h4 {
+    font-family: 'Oswald', sans-serif; font-size: .8rem;
+    font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--accent); margin-bottom: .75rem;
+}
+.footer-col ul { list-style: none; padding: 0; margin: 0; }
+.footer-col li { margin-bottom: .45rem; }
+.footer-col li a { font-size: .84rem; }
+
+.footer-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(255,255,255,.06);
+    font-size: .78rem; color: var(--text-dim);
+}
+
+@media (max-width: 768px) {
+    .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: .5rem; text-align: center; }
 }
 
 /* ── SCROLL ANIMATION ── */
